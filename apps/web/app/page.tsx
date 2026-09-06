@@ -1,19 +1,48 @@
+import { prisma } from "@workspace/database"
 import { Button } from "@workspace/ui/components/button"
 
-export default function Page() {
+export default async function Page() {
+  const users = await prisma.user.findMany({
+    orderBy: { createdAt: "desc" },
+  })
+
   return (
-    <div className="flex min-h-svh p-6">
-      <div className="flex max-w-md min-w-0 flex-col gap-4 text-sm leading-loose">
-        <div>
-          <h1 className="font-medium">Project ready!</h1>
-          <p>You may now add components and start building.</p>
-          <p>We&apos;ve already added the button component for you.</p>
-          <Button className="mt-2">Button</Button>
+    <div className="flex min-h-svh flex-col items-center justify-center p-6 bg-background text-foreground">
+      <div className="w-full max-w-lg space-y-6">
+        <div className="text-center space-y-2">
+          <h1 className="text-3xl font-bold tracking-tight">Database Users Test</h1>
+          <p className="text-muted-foreground text-sm">
+            Fetched {users.length} seeded users from Prisma Database.
+          </p>
         </div>
-        <div className="text-muted-foreground font-mono text-xs">
-          (Press <kbd>d</kbd> to toggle dark mode)
+
+        <div className="grid gap-3">
+          {users.map((user) => (
+            <div
+              key={user.id}
+              className="flex items-center gap-4 p-4 rounded-xl border bg-card text-card-foreground shadow-sm transition-all hover:shadow-md"
+            >
+              {user.avatarUrl && (
+                <img
+                  src={user.avatarUrl}
+                  alt={user.name || user.username}
+                  className="w-12 h-12 rounded-full border bg-muted"
+                />
+              )}
+              <div className="flex-1 min-w-0">
+                <h3 className="font-semibold text-base truncate">{user.name || user.username}</h3>
+                <p className="text-xs text-muted-foreground truncate">@{user.username}</p>
+                <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="flex justify-center pt-2">
+          <Button variant="outline">Test Component</Button>
         </div>
       </div>
     </div>
   )
 }
+
